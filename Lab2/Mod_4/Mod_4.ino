@@ -23,7 +23,6 @@ void loop() {
     output = IRR.receive(100);
     if (output != 0){
       Serial.println(char(output));
-      Serial.println(output);
     }
   }
 }
