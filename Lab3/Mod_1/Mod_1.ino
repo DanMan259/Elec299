@@ -69,50 +69,6 @@ int RightCountEncoder(){
   return RCount;
 }
 
-void AdjustSpeeds(){
-  if ((rightButton.isReleased()) || (leftButton.isReleased()))    //both bumpers pressed
-    {
-      delay(500);
-    }
-  if (leftButton.isReleased()){                                   //only left bumper pressed
-      leftSpeed = 160;
-      rightSpeed = 240;
-      while (LeftCountEncoder() <= rotationTicks*3){
-        Serial.print("left curve\n");
-        digitalWrite(M1, HIGH);           //right motor forward
-        digitalWrite(M2, HIGH);           //left motoro forward
-        analogWrite(E1, rightSpeed);      //right motor 240 speed
-        analogWrite(E2, leftSpeed);       //left motor 160 speed
-         }
-    }
-    else if (rightButton.isReleased()){                            //only right bumper pressed
-      leftSpeed = 240;
-      rightSpeed = 160;
-      while (RightCountEncoder() <= rotationTicks*3){
-        Serial.print("right curve\n");
-        digitalWrite(M1, HIGH);           //right motor forward
-        digitalWrite(M2, HIGH);           //left motoro forward
-        analogWrite(E1, rightSpeed);      //right motor 160 speed
-        analogWrite(E2, leftSpeed);       //left motor 240 speed
-         }
-    }
-    else if ((leftButton.isReleased()) || (leftButton.isReleased())) //both bumpers pressed
-      {
-        EEPROM.write(0, leftSpeed);
-        EEPROM.write(1, rightSpeed);
-        leftSpeed = 0;
-        rightSpeed = 0;
-        delay(100);
-      }
-}
-
-void Forward(){
-    digitalWrite(M1, HIGH);
-    digitalWrite(M2, HIGH);
-    analogWrite(E1, 100);
-    analogWrite(E2, 100);
-}
-
 void clearVar(){
     LCount=0;
     RCount=0;
@@ -138,8 +94,10 @@ void loop() {
     if ((rightButton.isReleased()) && (leftButton.isReleased())){
       Serial.println("Both Clicked");
         while(true){
-          Forward();
-          AdjustSpeeds();
+          digitalWrite(M1, HIGH);
+          digitalWrite(M2, HIGH);
+          analogWrite(E1, 100);
+          analogWrite(E2, 100);
           if ((rightButton.isReleased()) && (leftButton.isReleased())){
   
               clearVar();
