@@ -1,4 +1,4 @@
-Elec299 Queens University Group 16
+Elec299 Queens University
 
 
 Mechatronics Project
