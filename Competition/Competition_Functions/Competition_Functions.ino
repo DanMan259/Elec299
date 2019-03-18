@@ -44,6 +44,9 @@ class Button {
             }
             return false;
         }
+        bool isPressed(){
+          return digitalRead(_pin);
+        }
 };
 
 QSerial IRR;
@@ -58,10 +61,51 @@ void iniPosition(){
     POS = IRR.receive(100);
   }
 }
+/* Pseudo Coded Section
+
+void followLine(speed){ 
+  //Set both left and right motor to the current speed 
+} 
+
+void followLinecount(speed, numInter){ 
+
+  //intialize the intersection count to zero 
+  int interCount= 0 
+
+  //While the interCount is less than the number of intersections that want to be passed  
+
+  while(interCount < numInter){ 
+    followLine(speed); 
+    //wait until an intersection is detected based off the IR line detector 
+    //Intersection can be found if all three bottom sensors (Left, Right, and Center) sense black 
+    //The code for the detection would be here 
+    //update InterCount when an intersection is detected 
+    interCount++; 
+  } 
+} 
+
+void rotate(Speed, left, numberOf90Rotations, delayStart){ 
+  If (left){ 
+    //if left is true 
+    //Set left motor to –1*speed and right motor to speed 
+  } else { 
+    //if left is false, which means right 
+    //Set left motor to speed and right motor to –1* speed 
+  } 
+  
+  for (loop until numberOf90Rotations){ 
+    //Delay to give the machine a headstart so it won't detect the same line 
+    delay(delayStart) 
+    //The light sensors would then be used to detect whether the robot positioned at a line 
+    //The code for the detection would be here 
+    
+  }
+} 
+*/
 
 bool touchWall(){ 
   //This function returns whether either of the bumpers have been pressed 
-  return (rightBumper.isReleased() || leftBumper.isReleased());
+  return (rightBumper.isPressed() || leftBumper.isPressed());
 }
 
 void interactBall(){ 

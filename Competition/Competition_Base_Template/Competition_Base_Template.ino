@@ -44,6 +44,9 @@ class Button {
             }
             return false;
         }
+        bool isPressed(){
+          return digitalRead(_pin);
+        }
 };
 
 QSerial IRR;
