@@ -4,8 +4,8 @@
 
 // Define constants for pins and other variables/objects 
 #define GRIPSERVO 10
-#define PANSERVO 9
-#define TILTSERVO 8
+#define PANSERVO 8
+#define TILTSERVO 9
 #define GRIPSENSOR 12
 #define M1 7
 #define E1 6
@@ -17,6 +17,9 @@
 #define CLINE A2
 #define LLINE A0
 #define IRRRX 11
+#define panStart 105
+#define tiltStart 180
+#define gripStart 0
 #define LIGHTTHRESHOLD 600
 #define LEFTLOW 150
 #define RIGHTLOW 150
@@ -99,10 +102,9 @@ void followLine(int speed, int kP){
 
     //Write the value to the motor
     setDrive(right_pow,left_pow);
-} 
+}
 
 void followLinecount(int speed, int numInter){ 
-
   //intialize the intersection count to zero
   int interCount, LVal, RVal;
   LVal = RVal = interCount = 0; 
@@ -117,13 +119,15 @@ void followLinecount(int speed, int numInter){
     RVal = analogRead(RLINE);
     
     if ((LVal > LIGHTTHRESHOLD) && (RVal > LIGHTTHRESHOLD)){
-      //update InterCount when an intersection is detected 
+      //update InterCount when an intersection is detected
+      delay(100); 
       interCount++;
     } 
   }
   //Stop when done intersections
+  delay(200);
   setDrive(0,0);
-} 
+}  
 
 void rotate(int speed, bool left, int numberOfLinesPassed, int delayStart){
   if (left){ 
@@ -139,11 +143,12 @@ void rotate(int speed, bool left, int numberOfLinesPassed, int delayStart){
   for (int i = 0; i<= numberOfLinesPassed; i++){ 
     //Delay to give the machine a headstart so it won't detect the same line
     delay(delayStart);
-    while(!(analogRead(RLINE) >= LIGHTTHRESHOLD)){
+    while(!(analogRead(CLINE) >= LIGHTTHRESHOLD)){
       Serial.println("Rotating");
     }
   }
   setDrive(0, 0);
+  delay(500);
 } 
 
 bool touchWall(){ 
@@ -152,25 +157,34 @@ bool touchWall(){
 }
 
 void interactBall(){ 
-  int gripValue = 40;
+  int gripValue = 0;
+  int gripped = 0;
   //This code can both pick up or drop off the ball 
   //First position the gripper’s tilt servo at 115-120 degrees and open the gripper 
-  
   tiltServo.write(120);
+  delay(3000);
   gripServo.write(gripValue);
+  delay(3000);
   
-  //Position the tilt servo at 160 degrees then start closing the gripper until closed or ball gripped 
-  tiltServo.write(160);
-  
+  //Position the tilt servo at 70 degrees then start closing the gripper until closed or ball gripped 
+  tiltServo.write(90);
+  delay(1000);
   //Checked whether ball is gripped using the grip sensor 
-  while (digitalRead(GRIPSENSOR) != 1){ 
+  while (!gripped){
     //Keep increasing grip servo until ball is gripped or servo completely closed
-    delay(50);
+    delay(5);
     gripServo.write(++gripValue);
-  } 
+    gripped = digitalRead(GRIPSENSOR);
+    if (gripValue == 180){
+      gripped = 1;  
+    }
+  }
+  Serial.println("Gripped or Closed");
+  delay(1000);
   
   //Position the tilt servo completely up 
-  tiltServo.write(160) ;
+  tiltServo.write(tiltStart);
+  delay(1000);
 } 
 
 void setup() {
@@ -197,9 +211,9 @@ void setup() {
   iniPosition(); 
 
   //Initialize gripper servo to upright, centre, and open grippers 
-  panServo.write(90);
-  tiltServo.write(160);
-  gripServo.write(40);
+  panServo.write(panStart);
+  tiltServo.write(tiltStart);
+  gripServo.write(gripStart);
 }
 
 void loop() {

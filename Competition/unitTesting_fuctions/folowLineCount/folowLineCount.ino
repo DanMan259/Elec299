@@ -113,7 +113,7 @@ void followLinecount(int speed, int numInter){
     
     if ((LVal > LIGHTTHRESHOLD) && (RVal > LIGHTTHRESHOLD)){
       //update InterCount when an intersection is detected
-      delay(150); 
+      delay(100); 
       interCount++;
     } 
   }
