@@ -17,6 +17,12 @@
 #define CLINE A2
 #define LLINE A0
 #define IRRRX 11
+#define panStart 105
+#define tiltStart 180
+#define gripStart 0
+#define LIGHTTHRESHOLD 600
+#define LEFTLOW 150
+#define RIGHTLOW 150
 
 int ballCount = 0;
 int POS = 0;
@@ -45,7 +51,7 @@ class Button {
             return false;
         }
         bool isPressed(){
-          return digitalRead(_pin);
+          return !digitalRead(_pin);
         }
 };
 
@@ -87,9 +93,9 @@ void setup() {
   iniPosition(); 
 
   //Initialize gripper servo to upright, centre, and open grippers 
-  panServo.write(90);
-  tiltServo.write(160);
-  gripServo.write(40);
+  panServo.write(panStart);
+  tiltServo.write(tiltStart);
+  gripServo.write(gripStart);
 }
 
 void loop() {
