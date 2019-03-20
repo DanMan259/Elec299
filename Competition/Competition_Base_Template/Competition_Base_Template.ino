@@ -4,9 +4,9 @@
 
 // Define constants for pins and other variables/objects 
 #define GRIPSERVO 10
-#define PANSERVO 9
-#define TILTSERVO 8
-#define GRIPSENSOR 13
+#define PANSERVO 8
+#define TILTSERVO 9
+#define GRIPSENSOR 12
 #define M1 7
 #define E1 6
 #define M2 4
@@ -16,7 +16,7 @@
 #define RLINE A1
 #define CLINE A2
 #define LLINE A0
-#define IRRRX 1
+#define IRRRX 11
 
 int ballCount = 0;
 int POS = 0;
