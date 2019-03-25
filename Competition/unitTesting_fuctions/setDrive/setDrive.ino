@@ -104,12 +104,24 @@ void setup() {
 }
 
 void loop() {
-  setDrive(200, 200*-1);
-  delay(5000);
-  setDrive(200*-1, 200);
-  delay(5000);
-  setDrive(-200,-200);
-  delay(5000);
-  setDrive(200,200);
-  delay(5000);
+//  setDrive(200, 200*-1);
+//  delay(5000);
+//  setDrive(200*-1, 200);
+//  delay(5000);
+//  setDrive(-200,-200);
+//  delay(5000);
+//  setDrive(200,200);
+//  delay(5000);
+
+//  setDrive(-200,-200);
+//  delay(1200);
+//  setDrive(0,0);
+//  delay(500000);
+
+
+    setDrive(-100,100);
+    delay(400);
+    setDrive(0,0);
+    delay(500000);
+
 }

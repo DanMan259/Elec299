@@ -123,5 +123,5 @@ void setup() {
 }
 
 void loop() {
-  followLine(100, 80);
+  followLine(100, 100);
 }

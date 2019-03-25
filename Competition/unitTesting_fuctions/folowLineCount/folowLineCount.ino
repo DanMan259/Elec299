@@ -97,28 +97,34 @@ void followLine(int speed, int kP){
 }
 
 void followLinecount(int speed, int numInter){ 
-
   //intialize the intersection count to zero
-  int interCount, LVal, RVal;
-  LVal = RVal = interCount = 0; 
+  int interCount, AVGValue;
+  interCount = AVGValue = 0;
 
   //While the interCount is less than the number of intersections that want to be passed  
 
+   
   while(interCount < numInter){ 
-    followLine(speed, 80); 
+    followLine(speed, 80);
+    AVGValue = (analogRead(LLINE)+analogRead(CLINE)+analogRead(RLINE))/3;
     //wait until an intersection is detected based off the IR line detector 
     //Intersection can be found if all three bottom sensors (Left, Right, and Center) sense black
-    LVal = analogRead(LLINE);
-    RVal = analogRead(RLINE);
+    if (AVGValue > LIGHTTHRESHOLD){
+      int temp = interCount;
+      while (interCount < temp+1){
+        //When an intersection is detected, loop until it leaves it to to then stop the robot then updated InterCount
+        followLine(speed, 80);
+        Serial.println(String(analogRead(LLINE))+"\n"+String(analogRead(RLINE))+"\n");
     
-    if ((LVal > LIGHTTHRESHOLD) && (RVal > LIGHTTHRESHOLD)){
-      //update InterCount when an intersection is detected
-      delay(100); 
-      interCount++;
+        if (analogRead(LLINE) < LIGHTTHRESHOLD && analogRead(RLINE) < LIGHTTHRESHOLD){
+          interCount++;
+          Serial.println("Updated Count");
+        }  
+      }
+      
     } 
   }
   //Stop when done intersections
-  delay(200);
   setDrive(0,0);
 } 
 
@@ -149,6 +155,6 @@ void setup() {
 }
 
 void loop() {
-  followLinecount(100, 2);
+  followLinecount(150, 1);
   delay(5000);
 }

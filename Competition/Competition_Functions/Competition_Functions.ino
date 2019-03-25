@@ -25,7 +25,7 @@
 #define RIGHTLOW 150
 
 int ballCount = 0;
-int POS = 0;
+int POS = -1;
 
 class Button {
     private:
@@ -51,7 +51,7 @@ class Button {
             return false;
         }
         bool isPressed(){
-          return !digitalRead(_pin);
+          return !_state;
         }
 };
 
@@ -63,8 +63,8 @@ Button leftBumper(LBUMPER);
 void iniPosition(){
   //This function allows for the robot to be assigned a starting position via the IR transmitter circuit 
   //Receives Code from IR Sensor 
-  while (!(POS == 1 || POS == 2 || POS == 3)){ 
-    POS = IRR.receive(100);
+  while (!(POS == 0 || POS == 1 || POS == 2)){ 
+    POS = int(char(IRR.receive(100)));
   }
 }
 
@@ -162,7 +162,7 @@ void interactBall(){
   //This code can both pick up or drop off the ball 
   //First position the gripper’s tilt servo at 115-120 degrees and open the gripper 
   tiltServo.write(120);
-  delay(3000);
+  //delay(3000);
   gripServo.write(gripValue);
   delay(3000);
   
@@ -219,7 +219,7 @@ void setup() {
 void loop() {
   //The steps inside each of the if statements would utilize the base functions provided at the top 
   
-  if (POS ==  1){ 
+  if (POS ==  0){ 
     // In this step the code would reflect the actions of robot at position 1 
     //increase the ball count to work towards a new path 
     ballCount++;
@@ -313,7 +313,7 @@ void loop() {
       setDrive(0,0);
       
     } 
-  } else if (POS ==  2){
+  } else if (POS ==  1){
     // In this step the code would reflect the actions of robot at position 2 
     //increase the ball count to work towards a new path 
     ballCount++;

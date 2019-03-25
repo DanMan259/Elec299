@@ -77,25 +77,51 @@ void setDrive(int rightPow, int leftPow){
   analogWrite(E2, leftPow);
 }
 
-void rotate(int speed, bool left, int numberOfLinesPassed, int delayStart){
-  if (left){ 
-    //if left is true
-    setDrive(speed, speed*-1);
-    //Set left motor to –1*speed and right motor to speed 
-  } else { 
-    //if left is false, which means right
-    setDrive(speed*-1, speed); 
-    //Set left motor to speed and right motor to –1* speed 
-  }
-  
-  for (int i = 0; i<= numberOfLinesPassed; i++){ 
+void rotate(int speed, bool left, int maxLinesPassed, int delayStart){
+  int linesPasses = 0;
+    
+  while(linesPasses < maxLinesPassed){
+    if (left){ 
+      //if left is true
+      //Set left motor to –1*speed and right motor to speed 
+      setDrive(speed, speed*-1);
+    } else {
+      //if left is false, which means right
+      //Set left motor to speed and right motor to –1* speed
+      setDrive(speed*-1, speed);
+    }
+    
     //Delay to give the machine a headstart so it won't detect the same line
     delay(delayStart);
-    while(!(analogRead(CLINE) >= LIGHTTHRESHOLD)){
-      Serial.println("Rotating");
+    if (analogRead(CLINE)>LIGHTTHRESHOLD){
+      linesPasses++;
+      setDrive(0, 0);
+      delay(delayStart);
     }
   }
-  setDrive(0, 0);
+
+//  int count = 0;
+//  int memory = 0;
+//  int memory2 = 0;
+//  int current = 0;  
+//    while(numberOfLinesPassed>tempLines){
+//        Serial.println("CLINE " + String(analogRead(CLINE)));
+//        count++;
+//        memory = analogRead(CLINE);
+//        delay(160);
+//        current = analogRead(CLINE);
+//        delay(160);
+//        memory2 = analogRead(CLINE);
+//          
+//        //Serial.println("Rotating");
+//        if (memory < LIGHTTHRESHOLD && current > LIGHTTHRESHOLD && memory2 < LIGHTTHRESHOLD ){
+//          tempLines++;
+//  
+//          Serial.println("tempLines " + String(tempLines));
+//          Serial.println("CLINE " + String(analogRead(CLINE)));
+//      }
+//    }
+//    setDrive(0, 0);
 } 
 
 void setup() {
@@ -125,13 +151,13 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Left 90");
   rotate(100, 1, 1, 200);
-  delay(3000);
   Serial.println("Right 180");
-  rotate(100, 0, 2, 200);
   delay(3000);
+  rotate(100, 0, 2, 200);
   Serial.println("Left 270");
+  delay(3000);
   rotate(100, 1, 3, 200);
+  Serial.println("Left 90");
   delay(3000);
 }

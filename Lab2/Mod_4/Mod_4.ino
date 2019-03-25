@@ -3,7 +3,7 @@
 QSerial IRR;
 
 int output = 0;
-int rx=3;
+int rx=11;
 int tx=2;
 int tr = 0;
 
@@ -20,9 +20,6 @@ void loop() {
   if (tr){
     IRR.transmit('2');  
   }else{
-    output = IRR.receive(100);
-    if (output != 0){
-      Serial.println(char(output));
-    }
+    Serial.println(char(IRR.receive(200)));
   }
 }
