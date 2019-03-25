@@ -106,49 +106,81 @@ void followLine(int speed, int kP){
 
 void followLinecount(int speed, int numInter){ 
   //intialize the intersection count to zero
-  int interCount, LVal, RVal;
-  LVal = RVal = interCount = 0; 
+  int interCount, AVGValue;
+  interCount = AVGValue = 0;
 
   //While the interCount is less than the number of intersections that want to be passed  
 
+   
   while(interCount < numInter){ 
-    followLine(speed, 80); 
+    followLine(speed, 80);
+    AVGValue = (analogRead(LLINE)+analogRead(CLINE)+analogRead(RLINE))/3;
     //wait until an intersection is detected based off the IR line detector 
     //Intersection can be found if all three bottom sensors (Left, Right, and Center) sense black
-    LVal = analogRead(LLINE);
-    RVal = analogRead(RLINE);
+    if (AVGValue > LIGHTTHRESHOLD){
+      int temp = interCount;
+      while (interCount < temp+1){
+        //When an intersection is detected, loop until it leaves it to to then stop the robot then updated InterCount
+        followLine(speed, 80);
+        Serial.println(String(analogRead(LLINE))+"\n"+String(analogRead(RLINE))+"\n");
     
-    if ((LVal > LIGHTTHRESHOLD) && (RVal > LIGHTTHRESHOLD)){
-      //update InterCount when an intersection is detected
-      delay(100); 
-      interCount++;
+        if (analogRead(LLINE) < LIGHTTHRESHOLD && analogRead(RLINE) < LIGHTTHRESHOLD){
+          interCount++;
+          Serial.println("Updated Count");
+        }  
+      }
+      
     } 
   }
   //Stop when done intersections
-  delay(200);
   setDrive(0,0);
-}  
+} 
 
-void rotate(int speed, bool left, int numberOfLinesPassed, int delayStart){
-  if (left){ 
-    //if left is true
-    setDrive(speed, speed*-1);
-    //Set left motor to –1*speed and right motor to speed 
-  } else { 
-    //if left is false, which means right
-    setDrive(speed*-1, speed); 
-    //Set left motor to speed and right motor to –1* speed 
-  }
-  
-  for (int i = 0; i<= numberOfLinesPassed; i++){ 
+void rotate(int speed, bool left, int maxLinesPassed, int delayStart){
+  int linesPasses = 0;
+    
+  while(linesPasses < maxLinesPassed){
+    if (left){ 
+      //if left is true
+      //Set left motor to –1*speed and right motor to speed 
+      setDrive(speed, speed*-1);
+    } else {
+      //if left is false, which means right
+      //Set left motor to speed and right motor to –1* speed
+      setDrive(speed*-1, speed);
+    }
+    
     //Delay to give the machine a headstart so it won't detect the same line
     delay(delayStart);
-    while(!(analogRead(CLINE) >= LIGHTTHRESHOLD)){
-      Serial.println("Rotating");
+    if (analogRead(CLINE)>LIGHTTHRESHOLD){
+      linesPasses++;
+      setDrive(0, 0);
+      delay(delayStart);
     }
   }
-  setDrive(0, 0);
-  delay(500);
+
+//  int count = 0;
+//  int memory = 0;
+//  int memory2 = 0;
+//  int current = 0;  
+//    while(numberOfLinesPassed>tempLines){
+//        Serial.println("CLINE " + String(analogRead(CLINE)));
+//        count++;
+//        memory = analogRead(CLINE);
+//        delay(160);
+//        current = analogRead(CLINE);
+//        delay(160);
+//        memory2 = analogRead(CLINE);
+//          
+//        //Serial.println("Rotating");
+//        if (memory < LIGHTTHRESHOLD && current > LIGHTTHRESHOLD && memory2 < LIGHTTHRESHOLD ){
+//          tempLines++;
+//  
+//          Serial.println("tempLines " + String(tempLines));
+//          Serial.println("CLINE " + String(analogRead(CLINE)));
+//      }
+//    }
+//    setDrive(0, 0);
 } 
 
 bool touchWall(){ 
