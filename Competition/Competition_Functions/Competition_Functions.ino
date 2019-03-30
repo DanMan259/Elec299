@@ -382,6 +382,8 @@ void loop() {
       rotate(150, 1, 1, 200);
     } else { 
       //Stop the first robot
+      followLine(100, 100);
+      delay(100);
       setDrive(0,0);
     } 
   } else if (POS ==  1){
