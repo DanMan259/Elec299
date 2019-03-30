@@ -25,7 +25,8 @@
 #define RIGHTLOW 150
 
 int ballCount = 0;
-int POS = 0;
+int cycleCount = 0;
+int POS = -1;
 
 class Button {
     private:
@@ -77,12 +78,23 @@ void setDrive(int rightPow, int leftPow){
   analogWrite(E2, leftPow);
 }
 
+void moveDrive(int rightPow, int leftPow, int timeDelay){
+  setDrive(rightPow, leftPow);
+  delay(timeDelay);
+  setDrive(0, 0);
+}
+
+bool touchWall(){ 
+  //This function returns whether either of the bumpers have been pressed 
+  return (rightBumper.isPressed() || leftBumper.isPressed());
+}
+
 void followLine(int speed, int kP){
     //Follows the line and sets speed based off of error
     
     //Minimum speed
     int LF_MIN = 10;
-
+    
     //Gets the error in the left and right
     int left_error = analogRead(LLINE) - LEFTLOW;
     int right_error = analogRead(RLINE) - RIGHTLOW;
@@ -90,7 +102,7 @@ void followLine(int speed, int kP){
 
     //calculates the left and right speed
     int left_pow = max(speed - (error * kP / 1000), LF_MIN);
-    int right_pow = max(speed + (error * kP / 1000), LF_MIN);
+    int right_pow = max((speed + (error * kP / 1000))*0.92, LF_MIN);
 
     //Write the value to the motor
     setDrive(right_pow,left_pow);
@@ -123,5 +135,13 @@ void setup() {
 }
 
 void loop() {
-  followLine(100, 100);
+  cycleCount = 0;
+  while(cycleCount < 40){
+    followLine(100, 100);
+    if (touchWall()) cycleCount++;
+    else cycleCount = 0;
+    delay(1);
+  }
+  moveDrive(-92,-100, 500);
+  //setDrive(200*0.92,200);
 }

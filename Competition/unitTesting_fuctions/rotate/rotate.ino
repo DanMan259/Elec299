@@ -20,7 +20,7 @@
 #define panStart 105
 #define tiltStart 180
 #define gripStart 0
-#define LIGHTTHRESHOLD 600
+#define LIGHTTHRESHOLD 450
 #define LEFTLOW 150
 #define RIGHTLOW 150
 
@@ -78,27 +78,63 @@ void setDrive(int rightPow, int leftPow){
 }
 
 void rotate(int speed, bool left, int maxLinesPassed, int delayStart){
-  int linesPasses = 0;
-    
-  while(linesPasses < maxLinesPassed){
-    if (left){ 
-      //if left is true
-      //Set left motor to –1*speed and right motor to speed 
-      setDrive(speed, speed*-1);
-    } else {
-      //if left is false, which means right
-      //Set left motor to speed and right motor to –1* speed
-      setDrive(speed*-1, speed);
-    }
-    
-    //Delay to give the machine a headstart so it won't detect the same line
-    delay(delayStart);
-    if (analogRead(CLINE)>LIGHTTHRESHOLD){
-      linesPasses++;
-      setDrive(0, 0);
+  if (left)
+      setDrive(-speed, speed);
+  else
+      setDrive(speed, -speed);
+  for (int i = 0; i < maxLinesPassed; i++) {
       delay(delayStart);
-    }
+      int count = 0;
+      while (count < 40) {
+          if (analogRead(CLINE)>LIGHTTHRESHOLD) count++;
+          else count = 0;
+          delay(1);
+      }
   }
+
+  if (left)
+      setDrive(speed * 15, -speed * 15);
+  else
+      setDrive(-speed * 15, speed * 15);
+  delay(150);
+  setDrive(0,0);
+
+    
+//  while(linesPasses < maxLinesPassed){
+//    if (left){ 
+//      //if left is true
+//      //Set left motor to –1*speed and right motor to speed 
+//      setDrive(speed, speed*-1);
+//      //Delay to give the machine a headstart so it won't detect the same line
+//      delay(delayStart);
+//      if (analogRead(CLINE)>LIGHTTHRESHOLD){
+//          Serial.println("over black sensor reads: " + analogRead(CLINE));
+//        linesPasses++;
+//        setDrive(0, 0);
+//        delay(delayStart);
+//        }
+//    } else {
+//        Serial.println(analogRead(CLINE));
+//      //if left is false, which means right
+//      //Set left motor to speed and right motor to –1* speed
+//      setDrive(speed*-1, speed);
+//      //Delay to give the machine a headstart so it won't detect the same line
+//      delay(delayStart);
+//      if (analogRead(CLINE)>LIGHTTHRESHOLD){
+//        linesPasses++;
+//        setDrive(0, 0);
+//        delay(delayStart);
+//      }
+//    }
+    
+//    //Delay to give the machine a headstart so it won't detect the same line
+//    delay(delayStart);
+//    if (analogRead(CLINE)>LIGHTTHRESHOLD){
+//      linesPasses++;
+//      setDrive(0, 0);
+//      delay(delayStart);
+//    }
+//  }
 
 //  int count = 0;
 //  int memory = 0;
@@ -126,7 +162,7 @@ void rotate(int speed, bool left, int maxLinesPassed, int delayStart){
 
 void setup() {
   //Standard Initialization steps 
-  Serial.begin(9600);
+  Serial.begin(19200);
 
   //Initialize all the pins for the motors and sensors
   gripServo.attach(GRIPSERVO);
@@ -151,13 +187,13 @@ void setup() {
 }
 
 void loop() {
-  rotate(100, 1, 1, 200);
+  rotate(150, 1, 1, 150);
   Serial.println("Right 180");
   delay(3000);
-  rotate(100, 0, 2, 200);
+  rotate(150, 0, 2, 150);
   Serial.println("Left 270");
   delay(3000);
-  rotate(100, 1, 3, 200);
+  rotate(150, 1, 3, 150);
   Serial.println("Left 90");
   delay(3000);
 }
