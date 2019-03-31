@@ -90,22 +90,32 @@ bool touchWall(){
 }
 
 void followLine(int speed, int kP){
-    //Follows the line and sets speed based off of error
-    
-    //Minimum speed
-    int LF_MIN = 10;
-    
-    //Gets the error in the left and right
-    int left_error = analogRead(LLINE) - LEFTLOW;
-    int right_error = analogRead(RLINE) - RIGHTLOW;
-    int error = left_error - right_error;
+//    //Follows the line and sets speed based off of error
+//    
+//    //Minimum speed
+//    int LF_MIN = 10;
+//    
+//    //Gets the error in the left and right
+//    int left_error = analogRead(LLINE) - LEFTLOW;
+//    int right_error = analogRead(RLINE) - RIGHTLOW;
+//    int error = left_error - right_error;
+//
+//    //calculates the left and right speed
+//    int left_pow = max(speed - (error * kP / 1000), LF_MIN);
+//    int right_pow = max((speed + (error * kP / 1000))*0.92, LF_MIN);
+//
+//    //Write the value to the motor
+//    setDrive(right_pow,left_pow);
+    int LF_MIN = -30;
+    int left = analogRead(LLINE);
+    int right = analogRead(RLINE);
+    if (left > LIGHTTHRESHOLD && right < LIGHTTHRESHOLD)
+        setDrive(speed, LF_MIN);   
+    else if (left < LIGHTTHRESHOLD && right > LIGHTTHRESHOLD)
+        setDrive(LF_MIN, speed);
+    else
+        setDrive(speed*0.92, speed);
 
-    //calculates the left and right speed
-    int left_pow = max(speed - (error * kP / 1000), LF_MIN);
-    int right_pow = max((speed + (error * kP / 1000))*0.92, LF_MIN);
-
-    //Write the value to the motor
-    setDrive(right_pow,left_pow);
 } 
 
 void setup() {
@@ -135,13 +145,14 @@ void setup() {
 }
 
 void loop() {
-  cycleCount = 0;
-  while(cycleCount < 40){
-    followLine(100, 100);
-    if (touchWall()) cycleCount++;
-    else cycleCount = 0;
-    delay(1);
-  }
-  moveDrive(-92,-100, 500);
-  //setDrive(200*0.92,200);
+//  cycleCount = 0;
+//  while(cycleCount < 40){
+//    followLine(100, 100);
+//    if (touchWall()) cycleCount++;
+//    else cycleCount = 0;
+//    delay(1);
+//  }
+//  moveDrive(-92,-100, 500);
+//  setDrive(200*0.92,200);
+  followLine(200, 100);
 }

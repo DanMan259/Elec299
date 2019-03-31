@@ -89,6 +89,7 @@ void setup() {
 }
 
 void loop() {
+  int count = 0;
   if (touchWall()){
     Serial.println("Wall Touching"); 
   }

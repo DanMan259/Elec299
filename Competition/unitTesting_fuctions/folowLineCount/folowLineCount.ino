@@ -77,37 +77,54 @@ void setDrive(int rightPow, int leftPow){
   analogWrite(E2, leftPow);
 }
 
-void followLine(int speed, int kP){
-    //Follows the line and sets speed based off of error
-    
-    //Minimum speed
-    int LF_MIN = 10;
+void followLine(int speed){
+//    //Follows the line and sets speed based off of error
+//    
+//    //Minimum speed
+//    int LF_MIN = 10;
+//
+//    //Gets the error in the left and right
+//    int left_error = analogRead(LLINE) - LEFTLOW;
+//    int right_error = analogRead(RLINE) - RIGHTLOW;
+//    int error = left_error - right_error;
+//
+//    //calculates the left and right speed
+//    int left_pow = max(speed - (error * kP / 1000), LF_MIN);
+//    int right_pow = max((speed + (error * kP / 1000))*0.92, LF_MIN);
+//
+//    //Write the value to the motor
+//    setDrive(right_pow,left_pow);
 
-    //Gets the error in the left and right
-    int left_error = analogRead(LLINE) - LEFTLOW;
-    int right_error = analogRead(RLINE) - RIGHTLOW;
-    int error = left_error - right_error;
+    int LF_MIN = -30;
+    int left = analogRead(LLINE);
+    int right = analogRead(RLINE);
+    if (left > LIGHTTHRESHOLD && right < LIGHTTHRESHOLD)
+        setDrive(speed, LF_MIN);   
+    else if (left < LIGHTTHRESHOLD && right > LIGHTTHRESHOLD)
+        setDrive(LF_MIN, speed);
+    else
+        setDrive(speed*0.92, speed);
 
-    //calculates the left and right speed
-    int left_pow = max(speed - (error * kP / 1000), LF_MIN);
-    int right_pow = max((speed + (error * kP / 1000))*0.92, LF_MIN);
-
-    //Write the value to the motor
-    setDrive(right_pow,left_pow);
 }
 
-void followLinecount(int speed, int numInter, int kP = 100){ 
+void followLinecount(int speed, int numInter){ 
   //intialize the intersection count to zero
-  int interCount, AVGValue, count,temp;
-  interCount = AVGValue = count = temp = 0;
+  int interCount, count, temp, runningSpeed;
+  //int whiteCounter;
+  interCount = count = temp = 0;
+  runningSpeed = speed;
 
   //While the interCount is less than the number of intersections that want to be passed  
    
   while(interCount < numInter){
     count = 0;
+    //whiteCounter = 0
     Serial.println("Start");
+    
     while (count < 5) {
-      followLine(speed, kP);
+      followLine(runningSpeed);
+      //if ((analogRead(LLINE) < LIGHTTHRESHOLD) || (analogRead(RLINE) < LIGHTTHRESHOLD))whiteCounter++;
+      //if (whiteCounter%50 == 49)runningSpeed-=(0.05*runningSpeed);
       Serial.println(String(count)+" black cycle");
       //wait until an intersection is detected based off the IR line detector 
       //Intersection can be found if all three bottom sensors (Left, Right, and Center) sense black
@@ -115,12 +132,14 @@ void followLinecount(int speed, int numInter, int kP = 100){
       else count = 0;
       delay(1);
     }
+    runningSpeed = speed;
     temp = interCount;
+    //if (interCount == numInter-1) runningSpeed*=0.60;
     while (interCount < temp+1){
       //When an intersection is detected, loop until it leaves it to to then stop the robot then updated InterCount
       count = 0;
       while (count < 5) {
-        followLine(speed, kP);
+        followLine(runningSpeed);
         Serial.println(String(count)+" white cycle");
         if ((analogRead(LLINE) < LIGHTTHRESHOLD) || (analogRead(RLINE) < LIGHTTHRESHOLD))count++;
         else count = 0;
@@ -136,7 +155,7 @@ void followLinecount(int speed, int numInter, int kP = 100){
 
 void setup() {
   //Standard Initialization steps 
-  Serial.begin(9600);
+  Serial.begin(19200);
 
   //Initialize all the pins for the motors and sensors
   gripServo.attach(GRIPSERVO);
@@ -161,6 +180,6 @@ void setup() {
 }
 
 void loop() {
-  followLinecount(100, 2, 100);
-  delay(5000);
+  followLinecount(200, 2);
+  delay(3000);
 }
