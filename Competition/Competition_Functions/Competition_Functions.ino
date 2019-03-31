@@ -272,7 +272,9 @@ void loop() {
       interactBall();
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);  
-    } else if (ballCount == 2){ 
+    } 
+    
+    else if (ballCount == 2){ 
       //Code for first robot’s 2nd path
       followLinecount(forwardSpeed, 1);
       rotate(rotateSpeed, 1, 1, 200);
@@ -302,9 +304,10 @@ void loop() {
       interactBall();
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
-    } else if (ballCount == 3){ 
+    } 
+    else if (ballCount == 3){ 
       //Code for first robot’s 3rd path
-      followLinecount(forwardSpeed, 4);
+      followLinecount(forwardSpeed, 4);  //go forward 4 intersections PROBLEMS SOMETIMES HERE
       rotate(rotateSpeed, 1, 1, 200);
       cycleCount = 0;
       while(cycleCount < 40){
@@ -354,7 +357,8 @@ void loop() {
       interactBall();
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
-    } else if (ballCount == 5){ 
+    } 
+    else if (ballCount == 5){ 
       //Code for first robot’s 5st path
       followLinecount(forwardSpeed, 2);
       rotate(rotateSpeed, 0, 1, 200);
@@ -368,7 +372,7 @@ void loop() {
       moveDrive(-92,-100, 400);    
       interactBall();
       rotate(rotateSpeed, 1, 1, 200);       
-      followLinecount(forwardSpeed, 4);
+      followLinecount(forwardSpeed, 2);
       rotate(rotateSpeed, 1, 1, 200);
       cycleCount = 0;
       while(cycleCount < 40){
@@ -383,6 +387,7 @@ void loop() {
     } else { 
       //Stop the first robot
       setDrive(0,0);
+      delay(10000000);
     } 
   } else if (POS ==  1){
     // In this step the code would reflect the actions of robot at position 2 
@@ -390,47 +395,286 @@ void loop() {
     ballCount++;
     
     if (ballCount == 1){ 
-      //Code for second robot’s 1st path 
+    followLinecount(forwardSpeed, 1); //goes forward 1 intersections
+    rotate(rotateSpeed, 1, 1, 200);   //rotates left and then interacts with wall/ball
+    cycleCount = 0;
+    while(cycleCount < 40){
+      followLine(forwardSpeed);
+      if (touchWall()) cycleCount++;
+      else cycleCount = 0;
+      delay(1);
+    }
+    moveDrive(-92,-100, 400);
+    interactBall();
+    rotate(rotateSpeed, 1, 1, 200);       //rotate 180
+    followLinecount(forwardSpeed, 3);     //forward 3 intersections
+    rotate(rotateSpeed, 0, 1, 200);       //turns right and delivers ball
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);
     
     } else if (ballCount == 2){ 
-      //Code for second robot’s 2nd path 
-    
+      followLinecount(forwardSpeed, 1);   //forward 1 intersection | CHANGED THIS FROM 1
+      rotate(rotateSpeed, 0, 1, 200);     //rotate right until hit wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);   //rotate left 
+      followLinecount(forwardSpeed, 3); //move forward 3 intersections
+    rotate(rotateSpeed, 1, 1, 200);      //turn left back to deliver object
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();   //deliver ball
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);
+
     } else if (ballCount == 3){ 
-      //Code for second robot’s 3rd path 
-    
+      followLinecount(forwardSpeed, 4);   //go forward for 4 intersections
+      rotate(rotateSpeed, 1, 1, 200);     //turn left 90 degrees
+      followLinecount(forwardSpeed, 1);   //go forward for 1 intersection
+      rotate(rotateSpeed, 0, 1, 200);     //turn right 90 degrees until hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);     //turn left 180 degrees
+      followLinecount(forwardSpeed, 2);   //go forward 2 intersections
+      rotate(rotateSpeed, 1, 1, 200);     //turn left 90 degrees
+      followLinecount(forwardSpeed, 1);   //go forward 1 intersection
+      rotate(rotateSpeed, 0, 1, 200);     //turn right until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);
+
     } else if (ballCount == 4){ 
-      //Code for second robot’s 4st path 
+      cycleCount = 0;                   //goes straight until it hits wall
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);   
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200); 
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);
     
-    } else if (ballCount == 5){ 
-      //Code for second robot’s 5st path 
-      
+    } else if (ballCount == 5){          //POSITION 1 BALL 5
+      followLinecount(forwardSpeed, 4);  // go forward for 4 intersections
+      rotate(rotateSpeed, 0, 1, 200);     //turn right
+      followLinecount(forwardSpeed, 1);   //go forward 1 intersection
+      rotate(rotateSpeed, 1, 1, 200);     //turn left until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);    
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);  //rotate from wall 
+      followLinecount(forwardSpeed, 2); //forward 2 intersections
+      rotate(rotateSpeed, 0, 1, 200);   //turn right
+      followLinecount(forwardSpeed, 1); //go forward 1 intersection
+      rotate(rotateSpeed, 1, 1, 200);   //turn left until it hits wall CHANGED THIS FROM RIGHT HAND TURN
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);      
     } else { 
       //Stop the second robot 
-      
+      setDrive(0,0);
+      delay(10000000);
     }
   } else {
     // In this step the code would reflect the actions of robot at position 2 
     //increase the ball count to work towards a new path 
     ballCount++;
-    
+                                    //POSITION 2
     if (ballCount == 1){ 
-      //Code for third robot’s 1st path 
+      followLinecount(forwardSpeed, 4);   //forward 4 intersections
+      rotate(rotateSpeed, 0, 1, 200);     //turn right
+      followLinecount(forwardSpeed, 1);   //forward for 1 intersection until it hits wall
+      rotate(rotateSpeed, 1, 1, 200);
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);    //turn 180
+      followLinecount(forwardSpeed, 1);  //go forward 1 intersection
+    rotate(rotateSpeed, 0, 1, 200);       //turn right
+      followLinecount(forwardSpeed, 1);   //forward 1 intersection
+      rotate(rotateSpeed, 1, 1, 200);     //turn left
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);  
     
     } else if (ballCount == 2){ 
-      //Code for third robot’s 2nd path 
+      followLinecount(forwardSpeed, 3);  //go forward 3 intersections
+      rotate(rotateSpeed, 0, 1, 200);     //turn right until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);  //rotate 180 degrees
+      followLinecount(forwardSpeed, 2); //go forward 2 intersections
+      rotate(rotateSpeed, 1, 1, 200);   //turn left
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200); //rotate 180 degrees
     
     } else if (ballCount == 3){ 
-      //Code for third robot’s 3rd path 
+      followLinecount(forwardSpeed, 4); //go forward 4 intersections
+      rotate(rotateSpeed, 0, 1, 200);    //turn right until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);  //rotate 180
+      followLinecount(forwardSpeed, 2); //go forward 2 intersections
+      rotate(rotateSpeed, 1, 1, 200);   //turn left until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);
     
     } else if (ballCount == 4){ 
-      //Code for third robot’s 4st path 
+      followLinecount(forwardSpeed, 5); //go forward 5 intersections
+      rotate(rotateSpeed, 0, 1, 200);   //turn right until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);  //rotate 180 degres
+      followLinecount(forwardSpeed, 2); //go forward 2 intersections
+      rotate(rotateSpeed, 1, 1, 200);   //turn left unti lit hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);
     
     } else if (ballCount == 5){ 
-      //Code for third robot’s 5st path 
+      followLinecount(forwardSpeed, 2);   //go forward 2 intersections
+      rotate(rotateSpeed, 1, 1, 200);      //turn left until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);   //rotate 180 degrees 
+      followLinecount(forwardSpeed, 2); //go forward 2 intersections CHANGED THIS FROM 4
+      rotate(rotateSpeed, 0, 1, 200);   //turn right until it hits wall
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      interactBall();
+      moveDrive(-92,-100, 400);
+      rotate(rotateSpeed, 1, 1, 200);   
       
     } else { 
       //Stop the third robot 
-      
+      setDrive(0,0);
+      delay(10000000);
     } 
   
   } 
