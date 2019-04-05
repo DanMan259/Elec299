@@ -17,12 +17,14 @@
 #define CLINE A2
 #define LLINE A0
 #define IRRRX 11
+#define DISTANCEIR A3
 #define panStart 105
 #define tiltStart 180
 #define gripStart 0
 #define LIGHTTHRESHOLD 600
 #define LEFTLOW 150
 #define RIGHTLOW 150
+
 
 int ballCount = 0;
 int cycleCount = 0;
@@ -109,13 +111,16 @@ void followLine(int speed, int kP){
     int LF_MIN = -30;
     int left = analogRead(LLINE);
     int right = analogRead(RLINE);
-    if (left > LIGHTTHRESHOLD && right < LIGHTTHRESHOLD)
-        setDrive(speed, LF_MIN);   
-    else if (left < LIGHTTHRESHOLD && right > LIGHTTHRESHOLD)
-        setDrive(LF_MIN, speed);
-    else
-        setDrive(speed*0.92, speed);
-
+    if (analogRead(DISTANCEIR) >= 600){
+      setDrive(0, 0);
+    }else{  
+      if (left > LIGHTTHRESHOLD && right < LIGHTTHRESHOLD)
+          setDrive(speed, LF_MIN);   
+      else if (left < LIGHTTHRESHOLD && right > LIGHTTHRESHOLD)
+          setDrive(LF_MIN, speed);
+      else
+          setDrive(speed*0.92, speed);
+    }
 } 
 
 void setup() {
@@ -136,6 +141,7 @@ void setup() {
   pinMode(RLINE, INPUT);
   pinMode(CLINE, INPUT);
   pinMode(LLINE, INPUT);
+  pinMode(DISTANCEIR, INPUT);
   IRR.attach(IRRRX,-1);
 
   //Initialize gripper servo to upright, centre, and open grippers 

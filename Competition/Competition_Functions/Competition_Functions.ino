@@ -21,8 +21,6 @@
 #define tiltStart 180
 #define gripStart 0
 #define LIGHTTHRESHOLD 600
-#define LEFTLOW 150
-#define RIGHTLOW 150
 #define forwardSpeed  165
 #define rotateSpeed 150
 
@@ -66,12 +64,26 @@ Button leftBumper(LBUMPER);
 void iniPosition(){
   //This function allows for the robot to be assigned a starting position via the IR transmitter circuit 
   //Receives Code from IR Sensor 
-  while (!(POS == 0 || POS == 1 || POS == 2)){ 
-    POS = int(char(IRR.receive(100)));
+  int assigned = 0; 
+
+  while (!assigned) { 
+    int character = IRR.receive(100); 
+    if (character == '0'){ 
+      POS = 0;                           
+      assigned = 1; 
+    } else if (character == '1'){ 
+      POS = 1; 
+      assigned = 1; 
+    } else if(character == '2') { 
+      POS = 2; 
+      assigned = 1; 
+    }
   }
+  
 }
 
 void setDrive(int rightPow, int leftPow){
+  //Sets the speed and the direction of the motors
   if (rightPow >= 0){
     digitalWrite(M1, HIGH);
   }else {
@@ -89,13 +101,17 @@ void setDrive(int rightPow, int leftPow){
 }
 
 void moveDrive(int rightPow, int leftPow, int timeDelay){
+  //Moves the motors for a specified amount of time
   setDrive(rightPow, leftPow);
   delay(timeDelay);
   setDrive(0, 0);
 }
 
 void followLine(int speed){
-    int LF_MIN = -30;
+  //Followslins in both directions
+    int LF_MIN;
+    if (speed >= 0)LF_MIN = -30;
+    else LF_MIN = 30;
     int left = analogRead(LLINE);
     int right = analogRead(RLINE);
     if (left > LIGHTTHRESHOLD && right < LIGHTTHRESHOLD)
@@ -117,7 +133,7 @@ void followLinecount(int speed, int numInter){
   while(interCount < numInter){
     count = 0;
     Serial.println("Start");
-    
+    //makes  sure it reads IR sensors read black 3 times
     while (count < 4) {
       followLine(runningSpeed);
       Serial.println(String(count)+" black cycle");
@@ -131,7 +147,9 @@ void followLinecount(int speed, int numInter){
     temp = interCount;
     while (interCount < temp+1){
       //When an intersection is detected, loop until it leaves it to to then stop the robot then updated InterCount
+      //intercount is updated at a white line
       count = 0;
+      //make sure it reads 5 white values in a row
       while (count < 5) {
         followLine(runningSpeed);
         Serial.println(String(count)+" white cycle");
@@ -144,25 +162,29 @@ void followLinecount(int speed, int numInter){
     }
   }
   //Stop when done intersections
-  //setDrive(0,0);
+  //move past the intersection for 300 ms
   moveDrive(92, 100, 300);
 } 
 
 void rotate(int speed, bool left, int maxLinesPassed, int delayStart){
+  //Set speed based off rotation
   if (left)
       setDrive(speed, -speed);
   else
       setDrive(-speed, speed);
+
+  //do this command unit you get the desired  lines you want to rotate past
   for (int i = 0; i < maxLinesPassed; i++) {
       delay(delayStart);
       int count = 0;
+      //only move on when 40 black values are senses
       while (count < 40) {
           if (analogRead(CLINE)>LIGHTTHRESHOLD) count++;
           else count = 0;
           delay(1);
       }
   }
-
+  //Rotate in the opposite direction to get back on the line
   if (left)
       moveDrive (-speed * 15, speed * 15, 50);
   else
@@ -180,8 +202,9 @@ void interactBall(){
   setDrive(0,0);
   //This code can both pick up or drop off the ball 
   //First position the gripper’s tilt servo at 115-120 degrees and open the gripper 
+  delay(100);
   tiltServo.write(120);
-  //delay(3000);
+  delay(50);
   gripServo.write(gripValue);
   delay(1000);
   
@@ -222,11 +245,12 @@ void setup() {
   pinMode(RLINE, INPUT);
   pinMode(CLINE, INPUT);
   pinMode(LLINE, INPUT);
+  pinMode(DISTANCEIR, INPUT);
   IRR.attach(IRRRX,-1);
   
   //Initialize the robot to the position 
   //iniPosition();
-  POS = 0; 
+  POS = 1; 
 
   //Initialize gripper servo to upright, centre, and open grippers 
   panServo.write(panStart);
@@ -394,21 +418,22 @@ void loop() {
     //increase the ball count to work towards a new path 
     ballCount++;
     
-    if (ballCount == 1){ 
-    followLinecount(forwardSpeed, 1); //goes forward 1 intersections
-    rotate(rotateSpeed, 1, 1, 200);   //rotates left and then interacts with wall/ball
-    cycleCount = 0;
-    while(cycleCount < 40){
-      followLine(forwardSpeed);
-      if (touchWall()) cycleCount++;
-      else cycleCount = 0;
-      delay(1);
-    }
-    moveDrive(-92,-100, 400);
-    interactBall();
-    rotate(rotateSpeed, 1, 1, 200);       //rotate 180
-    followLinecount(forwardSpeed, 3);     //forward 3 intersections
-    rotate(rotateSpeed, 0, 1, 200);       //turns right and delivers ball
+    if (ballCount == 1){
+      //Code for second robot’s 1st path 
+      followLinecount(forwardSpeed, 1); //goes forward 1 intersections
+      rotate(rotateSpeed, 1, 1, 200);   //rotates left and then interacts with wall/ball
+      cycleCount = 0;
+      while(cycleCount < 40){
+        followLine(forwardSpeed);
+        if (touchWall()) cycleCount++;
+        else cycleCount = 0;
+        delay(1);
+      }
+      moveDrive(-92,-100, 400);
+      interactBall();
+      rotate(rotateSpeed, 1, 1, 200);       //rotate 180
+      followLinecount(forwardSpeed, 3);     //forward 3 intersections
+      rotate(rotateSpeed, 0, 1, 200);       //turns right and delivers ball
       cycleCount = 0;
       while(cycleCount < 40){
         followLine(forwardSpeed);
@@ -421,6 +446,7 @@ void loop() {
       rotate(rotateSpeed, 1, 1, 200);
     
     } else if (ballCount == 2){ 
+      //Code for second robot’s 2nd path 
       followLinecount(forwardSpeed, 1);   //forward 1 intersection | CHANGED THIS FROM 1
       rotate(rotateSpeed, 0, 1, 200);     //rotate right until hit wall
       cycleCount = 0;
@@ -446,7 +472,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
 
-    } else if (ballCount == 3){ 
+    } else if (ballCount == 3){
+      //Code for second robot’s 3rd path 
       followLinecount(forwardSpeed, 4);   //go forward for 4 intersections
       rotate(rotateSpeed, 1, 1, 200);     //turn left 90 degrees
       followLinecount(forwardSpeed, 1);   //go forward for 1 intersection
@@ -476,7 +503,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
 
-    } else if (ballCount == 4){ 
+    } else if (ballCount == 4){
+      //Code for second robot’s 4th path 
       cycleCount = 0;                   //goes straight until it hits wall
       while(cycleCount < 40){
         followLine(forwardSpeed);
@@ -498,7 +526,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
     
-    } else if (ballCount == 5){          //POSITION 1 BALL 5
+    } else if (ballCount == 5){
+      //Code for second robot’s 5th path 
       followLinecount(forwardSpeed, 4);  // go forward for 4 intersections
       rotate(rotateSpeed, 0, 1, 200);     //turn right
       followLinecount(forwardSpeed, 1);   //go forward 1 intersection
@@ -536,8 +565,8 @@ void loop() {
     // In this step the code would reflect the actions of robot at position 2 
     //increase the ball count to work towards a new path 
     ballCount++;
-                                    //POSITION 2
     if (ballCount == 1){ 
+      //Code for third robot’s 1st path  
       followLinecount(forwardSpeed, 4);   //forward 4 intersections
       rotate(rotateSpeed, 0, 1, 200);     //turn right
       followLinecount(forwardSpeed, 1);   //forward for 1 intersection until it hits wall
@@ -567,7 +596,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);  
     
-    } else if (ballCount == 2){ 
+    } else if (ballCount == 2){
+      //Code for third robot’s 2nd path 
       followLinecount(forwardSpeed, 3);  //go forward 3 intersections
       rotate(rotateSpeed, 0, 1, 200);     //turn right until it hits wall
       cycleCount = 0;
@@ -593,7 +623,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200); //rotate 180 degrees
     
-    } else if (ballCount == 3){ 
+    } else if (ballCount == 3){
+      //Code for third robot’s 3rd path
       followLinecount(forwardSpeed, 4); //go forward 4 intersections
       rotate(rotateSpeed, 0, 1, 200);    //turn right until it hits wall
       cycleCount = 0;
@@ -619,7 +650,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
     
-    } else if (ballCount == 4){ 
+    } else if (ballCount == 4){
+      //Code for third robot’s 4th path
       followLinecount(forwardSpeed, 5); //go forward 5 intersections
       rotate(rotateSpeed, 0, 1, 200);   //turn right until it hits wall
       cycleCount = 0;
@@ -645,7 +677,8 @@ void loop() {
       moveDrive(-92,-100, 400);
       rotate(rotateSpeed, 1, 1, 200);
     
-    } else if (ballCount == 5){ 
+    } else if (ballCount == 5){
+      //Code for third robot’s 5th path 
       followLinecount(forwardSpeed, 2);   //go forward 2 intersections
       rotate(rotateSpeed, 1, 1, 200);      //turn left until it hits wall
       cycleCount = 0;
